@@ -1,0 +1,26 @@
+package pack:name;
+
+interface api {
+  record product-item {
+    product-id: string,
+    name: string,
+    price: float32,
+    quantity: u32,
+  }
+
+  record order-confirmation {
+    order-id: string,
+  }
+
+  variant checkout-result {
+    error(string),
+    success(order-confirmation),
+  }
+
+  initialize-cart: func(user-id: string) -> result<string, string>;
+
+}
+
+world main {
+  export api;
+}

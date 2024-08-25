@@ -1,0 +1,8 @@
+node_modules/
+out/
+/.idea/
+/.bsp/
+/target/
+/project/target/
+/project/project/
+/.vscode/
