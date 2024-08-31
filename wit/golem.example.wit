@@ -1,4 +1,4 @@
-package pack:name;
+package golem:example;
 
 interface api {
   record product-item {
