@@ -9,8 +9,11 @@ case class ProductItem(
 
 case class OrderConfirmation(orderId: String)
 
-trait CheckoutResult
-object CheckoutResult {}
+sealed trait CheckoutResult
+object CheckoutResult {
+  case class success(orderConfirmation: OrderConfirmation) extends CheckoutResult
+  case class error(error: String) extends CheckoutResult
+}
 
 final case class State(userId: String, items: List[ProductItem]) { self =>
   def withUserId(userId: String): State = self.copy(userId = userId)
@@ -31,7 +34,7 @@ final case class State(userId: String, items: List[ProductItem]) { self =>
 }
 
 object State {
-  val empty = State(userId = "", items = List.empty)
+  val empty: State = State(userId = "", items = List.empty)
 }
 
 @cloud.golem.WitExport
@@ -46,58 +49,58 @@ object ShoppingCart extends Api { self =>
     } else WitResult.err("Error while initializing cart")
   }
 
-//  def addItem(item: ProductItem): Unit = {
-//    println(s"Adding item to the cart of user ${state.userId}")
-//    state = state.addItem(item)
-//  }
-//
-//  def removeItem(productId: String): Unit = {
-//    println(
-//      s"Removing item with product ID $productId from the cart of user ${state.userId}"
-//    )
-//    state = state.removeItem(productId)
-//  }
-//
-//  def updateItemQuantity(productId: String, quantity: Integer): Unit = {
-//    println(
-//      s"Updating quantity of item with product ID $productId to $quantity in the cart of user ${state.userId}"
-//    )
-//
-//    state = state.updateItemQuantity(productId, quantity)
-//  }
-//
-//  def checkout(): CheckoutResult = {
-//    def reserveInventory(): Either[String, Unit] =
-//      if (math.random() < 0.1) Left("Inventory not available") else Right(())
-//
-//    def chargeCreditCard(): Either[String, Unit] = Right(())
-//
-//    def generateOrder(): String = "238738674"
-//
-//    def dispatchOrder(): Either[String, Unit] = Right(())
-//
-//    def clearState(): Unit = state = state.clear
-//
-//    val result =
-//      for {
-//        _ <- reserveInventory()
-//        _ <- chargeCreditCard()
-//        orderId = generateOrder()
-//        _ <- dispatchOrder()
-//        _ = clearState()
-//        _ = println(s"Checkout for order $orderId")
-//      } yield OrderConfirmation(orderId)
-//
-//    result match {
-//      case Right(orderConfirmation) => CheckoutResult.success(orderConfirmation)
-//      case Left(error)              => CheckoutResult.error(error)
-//    }
-//  }
-//
-//  def getCartContents(): WitList[ProductItem] = {
-//    println(s"Getting cart contents for user ${state.userId}")
-//    WitList.fromList(state.items)
-//  }
+  def addItem(item: ProductItem): Unit = {
+    println(s"Adding item to the cart of user ${state.userId}")
+    state = state.addItem(item)
+  }
+
+  def removeItem(productId: String): Unit = {
+    println(
+      s"Removing item with product ID $productId from the cart of user ${state.userId}"
+    )
+    state = state.removeItem(productId)
+  }
+
+  def updateItemQuantity(productId: String, quantity: Integer): Unit = {
+    println(
+      s"Updating quantity of item with product ID $productId to $quantity in the cart of user ${state.userId}"
+    )
+
+    state = state.updateItemQuantity(productId, quantity)
+  }
+
+  def checkout(): CheckoutResult = {
+    def reserveInventory(): Either[String, Unit] =
+      if (math.random() < 0.1) Left("Inventory not available") else Right(())
+
+    def chargeCreditCard(): Either[String, Unit] = Right(())
+
+    def generateOrder(): String = "238738674"
+
+    def dispatchOrder(): Either[String, Unit] = Right(())
+
+    def clearState(): Unit = state = state.clear
+
+    val result =
+      for {
+        _ <- reserveInventory()
+        _ <- chargeCreditCard()
+        orderId = generateOrder()
+        _ <- dispatchOrder()
+        _ = clearState()
+        _ = println(s"Checkout for order $orderId")
+      } yield OrderConfirmation(orderId)
+
+    result match {
+      case Right(orderConfirmation) => CheckoutResult.success(orderConfirmation)
+      case Left(error)              => CheckoutResult.error(error)
+    }
+  }
+
+  def cartContents(): WitList[ProductItem] = {
+    println(s"Getting cart contents for user ${state.userId}")
+    WitList.fromList(state.items)
+  }
 //
 //  def getFirstItem(): WitOption[ProductItem] = {
 //    println(s"Getting first item for user ${state.userId}")
